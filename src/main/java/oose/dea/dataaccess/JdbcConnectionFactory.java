@@ -33,7 +33,7 @@ public class JdbcConnectionFactory {
     public Connection create()
     {
         try {
-            return DriverManager.getConnection(properties.getProperty("databaseurl") + "?user=" + properties.getProperty("user") + "&password=" + properties.getProperty("password"));
+            return DriverManager.getConnection(properties.getProperty("databaseurl") + "?user=" + properties.getProperty("user") + "&password=" + properties.getProperty("password") + "&serverTimezone=UTC");
         } catch (SQLException e) {
             logger.severe(e.getMessage());
         }
