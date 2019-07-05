@@ -2,19 +2,19 @@ package oose.dea.services.local;
 
 import oose.dea.dataaccess.Item;
 import oose.dea.dataaccess.ItemDAO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LocalItemServiceTest {
     @Mock
     ItemDAO itemDAO;
@@ -24,16 +24,16 @@ public class LocalItemServiceTest {
 
     private ArrayList<Item> items;
 
-    @Before
-    public void setUp() throws Exception {
-        items = new ArrayList<Item>() {{
+    @BeforeEach
+    public void setUp() {
+        items = new ArrayList<>() {{
             add(new Item("frik", "Vette hap", "Frikandel"));
         }};
         when(itemDAO.list()).thenReturn(items);
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void findAll() {
         assertEquals(localItemService.findAll(), items);
     }
 

@@ -22,12 +22,9 @@ public class JdbcConnectionFactory {
             this.properties = properties;
             this.properties.load(getClass().getClassLoader().getResourceAsStream("database.properties"));
             Class.forName(properties.getProperty("driver"));
-        } catch (ClassNotFoundException e) {
-            logger.severe(e.getMessage());
-        } catch (IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             logger.severe(e.getMessage());
         }
-
     }
 
     public Connection create()

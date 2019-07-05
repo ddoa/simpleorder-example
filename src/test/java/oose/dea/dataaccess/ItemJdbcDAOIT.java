@@ -1,13 +1,13 @@
 package oose.dea.dataaccess;
 
-import oose.dea.IntegrationTest;
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.reflect.Whitebox;
+import org.apache.commons.lang.reflect.FieldUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,18 +16,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-@PrepareForTest(ItemJdbcDAO.class)
-@Category(IntegrationTest.class)
+@Tag("integrationtest")
+@ExtendWith(MockitoExtension.class)
 public class ItemJdbcDAOIT {
     public static final String ERROR = "Error";
     private static JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
     private Item item = new Item("sku", "cat", "title");
 
-    @BeforeClass
+    @BeforeAll
     public static void prepare() throws SQLException {
         Connection connection = jdbcConnectionFactory.create();
         Statement statement = connection.createStatement();
@@ -60,9 +61,9 @@ public class ItemJdbcDAOIT {
     }
 
     @Test
-    public void whenSqlExceptionIsThrownDuringAddTheMessageGetsLogged() throws SQLException {
+    public void whenSqlExceptionIsThrownDuringAddTheMessageGetsLogged() throws SQLException, IllegalAccessException {
         Logger mockLogger = mock(Logger.class);
-        Whitebox.setInternalState(ItemJdbcDAO.class, "logger", mockLogger);
+        FieldUtils.writeStaticField(ItemJdbcDAO.class, "logger", mockLogger, true);
         ItemJdbcDAO itemJdbcDAO = createItemJdbcDAOWithMockedDependencies();
         itemJdbcDAO.add(item);
 
@@ -70,9 +71,10 @@ public class ItemJdbcDAOIT {
     }
 
     @Test
-    public void whenSqlExceptionIsThrownDuringListTheMessageGetsLogged() throws SQLException {
+    public void whenSqlExceptionIsThrownDuringListTheMessageGetsLogged() throws SQLException, IllegalAccessException {
         Logger mockLogger = mock(Logger.class);
-        Whitebox.setInternalState(ItemJdbcDAO.class, "logger", mockLogger);
+        FieldUtils.writeStaticField(ItemJdbcDAO.class, "logger", mockLogger, true);
+
         ItemJdbcDAO itemJdbcDAO = createItemJdbcDAOWithMockedDependencies();
         itemJdbcDAO.list();
 
@@ -87,28 +89,28 @@ public class ItemJdbcDAOIT {
         return new ItemJdbcDAO(mockConnectionFactory);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void findNotYetImplemented()
     {
         ItemJdbcDAO itemJdbcDAO = new ItemJdbcDAO(jdbcConnectionFactory);
-        itemJdbcDAO.find(0);
+        assertThrows(RuntimeException.class, () -> itemJdbcDAO.find(0));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void updateNotYetImplemented()
     {
         ItemJdbcDAO itemJdbcDAO = new ItemJdbcDAO(jdbcConnectionFactory);
-        itemJdbcDAO.update(null);
+        assertThrows(RuntimeException.class, () -> itemJdbcDAO.update(null));
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void removeNotYetImplemented()
     {
         ItemJdbcDAO itemJdbcDAO = new ItemJdbcDAO(jdbcConnectionFactory);
-        itemJdbcDAO.remove(null);
+        assertThrows(RuntimeException.class, () -> itemJdbcDAO.remove(null));
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() throws IOException {
         FileUtils.deleteDirectory(new File("/tmp/itemjdbcdaoit"));
     }

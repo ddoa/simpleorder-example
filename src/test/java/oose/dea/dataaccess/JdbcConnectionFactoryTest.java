@@ -1,19 +1,24 @@
 package oose.dea.dataaccess;
 
-import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.reflect.Whitebox;
+import org.apache.commons.lang.reflect.FieldUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-@PrepareForTest(JdbcConnectionFactory.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class JdbcConnectionFactoryTest {
 
     public static final String DEZE_CLASS_BESTAAT_NIET = "deze.class.bestaat.Niet";
@@ -23,19 +28,19 @@ public class JdbcConnectionFactoryTest {
     private static final String URL = "jdbc:h2";
     private static final String DRIVER = "org.h2.Driver";
 
+    @Mock Logger mockLogger;
+    @Mock Properties properties;
+
     @Test
-    public void createWithExistingPropertyFile() throws Exception {
+    public void createWithExistingPropertyFile() {
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
         assertNotNull(jdbcConnectionFactory.create());
     }
 
     @Test
-    public void whenDriverCannotBeFoundAnExceptionIsLogged() {
-        Logger mockLogger = mock(Logger.class);
-        Whitebox.setInternalState(JdbcConnectionFactory.class, "logger", mockLogger);
-
-        Properties properties = mock(Properties.class);
+    public void whenDriverCannotBeFoundAnExceptionIsLogged() throws IllegalAccessException {
         when(properties.getProperty("driver")).thenReturn(DEZE_CLASS_BESTAAT_NIET);
+        FieldUtils.writeStaticField(JdbcConnectionFactory.class, "logger", mockLogger, true);
 
         new JdbcConnectionFactory(properties);
 
@@ -43,12 +48,9 @@ public class JdbcConnectionFactoryTest {
     }
 
     @Test
-    public void whenPropertiesCannotBeLoadedAnExceptionIsLogged() throws IOException {
-        Logger mockLogger = mock(Logger.class);
-        Whitebox.setInternalState(JdbcConnectionFactory.class, "logger", mockLogger);
-
-        Properties properties = mock(Properties.class);
+    public void whenPropertiesCannotBeLoadedAnExceptionIsLogged() throws IOException, IllegalAccessException {
         doThrow(new IOException(KAN_GEEN_PROPERTIES_LEZEN)).when(properties).load(any(InputStream.class));
+        FieldUtils.writeStaticField(JdbcConnectionFactory.class, "logger", mockLogger, true);
 
         new JdbcConnectionFactory(properties);
 
@@ -56,15 +58,12 @@ public class JdbcConnectionFactoryTest {
     }
 
     @Test
-    public void whenAConnectionCannotBeCreatedASQLExcepionIsLogged() {
-        Logger mockLogger = mock(Logger.class);
-        Whitebox.setInternalState(JdbcConnectionFactory.class, "logger", mockLogger);
-
-        Properties properties = mock(Properties.class);
+    public void whenAConnectionCannotBeCreatedASQLExcepionIsLogged() throws IllegalAccessException {
         when(properties.getProperty("user")).thenReturn(USER);
         when(properties.getProperty("password")).thenReturn(PASS);
         when(properties.getProperty("databaseurl")).thenReturn(URL);
         when(properties.getProperty("driver")).thenReturn(DRIVER);
+        FieldUtils.writeStaticField(JdbcConnectionFactory.class, "logger", mockLogger, true);
 
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(properties);
         jdbcConnectionFactory.create();

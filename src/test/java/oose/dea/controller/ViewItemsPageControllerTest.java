@@ -2,12 +2,12 @@ package oose.dea.controller;
 
 import oose.dea.dataaccess.Item;
 import oose.dea.services.ItemService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ViewItemsPageControllerTest {
     @Mock
     ItemService itemService;
@@ -36,10 +36,10 @@ public class ViewItemsPageControllerTest {
 
     private ArrayList<Item> items;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
-        items = new ArrayList<Item>() {{
+        items = new ArrayList<>() {{
             add(new Item("frik", "Vette hap", "Frikandel"));
         }};
         when(itemService.findAll()).thenReturn(items);
