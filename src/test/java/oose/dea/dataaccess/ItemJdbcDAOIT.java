@@ -112,6 +112,7 @@ public class ItemJdbcDAOIT {
 
     @AfterAll
     public static void shutdown() throws IOException {
+        // adjust /tmp to c:/temp on Windows systems just like in the database.properties
         FileUtils.deleteDirectory(new File("/tmp/itemjdbcdaoit"));
     }
 }
